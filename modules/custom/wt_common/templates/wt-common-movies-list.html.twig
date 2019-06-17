@@ -1,0 +1,59 @@
+{% if not is_ajax %}
+<hr />
+<div class="movies-list container-fluid">
+  <div class="row">
+{% endif %}
+    {% if list is not empty %}
+      {% for item in list %}
+        {% if item.video_thumbnail is not empty %}
+        <div class="col-lg-3 col-md-6 col-sm-6 mb-3">
+          <a href="{{ path('entity.node.canonical', {'node': item.nid}) }}" class="d-block shadow bg-white rounded">
+            <span class="video-thumbnail d-block position-relative mb-2"
+              style="background-image: url({{ item.video_thumbnail }});">
+              <span>
+                <i class="far fa-5x fa-play-circle"></i>
+              </span>
+            </span>
+            <span class="d-block p-3 clearfix">
+              {% if item.thumbnail is not empty %}
+                <span class="movie-thumbnail d-block float-left">
+                  <img src="{{ item.thumbnail }}" alt="{{ item.title }}" />
+                </span>
+              {% endif %}
+              <span class="movie-info d-block">
+                <span class="movie-title d-block">
+                  {{ item.title ~ ((item.year is not empty) ? ' (' ~ item.year ~ ')' : '') }}
+                </span>
+                {% if item.rating is not empty %}
+                <span class="movie-rating d-block">
+                  <i class="fas fa-star mr-1"></i>
+                  {{ item.rating ~ ' ' ~ ('According to IMDB' | t) }}
+                </span>
+                {% endif %}
+                {% if item.length is not empty %}
+                  <span class="movie-length d-block">
+                  <i class="fas fa-video mr-1"></i>
+                  {{ item.length ~ ' ' ~ ('min' | t) }}
+                  </span>
+                {% endif %}
+              </span>
+            </span>
+          </a>
+        </div>
+        {% endif %}
+      {% endfor %}
+      <div class="col-lg-3 col-md-6 col-sm-6 mb-3">
+        <button id="movies-load-more" type="button" class="btn btn-success btn-lg" data-page="{{ page + 1 }}">
+          <i class="fas fa-redo-alt mr-1"></i>
+          {{ 'More' | t }}
+        </button>
+      </div>
+    {% else %}
+      <div class="col-lg-3 col-md-6 col-sm-6 mb-3">
+        <p>{{ 'There were no movie trailers found matching your criteria.' | t }}</p>
+      </div>
+    {% endif %}
+{% if not is_ajax %}
+  </div>
+</div>
+{% endif %}

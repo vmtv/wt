@@ -1,0 +1,138 @@
+/* 
+Theme Name: Bootstrap 4 Sass
+Description: Bootstrap 4 with Sass
+*/
+
+// import files
+@import "import";
+
+/* GENERAL STYLES
+-------------------------------------------------*/
+
+body {
+    background: $white;
+}
+
+
+/* COLORS 
+--------------------------------------------------*/
+
+a {
+    color: $accent-shade;
+}
+
+.bg-inverse {
+    background: $primary-shade !important;
+}
+
+.site-footer {
+    background: $accent-shade !important;
+}
+
+.menu--main li a {
+    color: $primary-shade;
+}
+
+.menu--account li a {
+    color: $primary-shade;
+}
+
+.site-name-slogan a {
+    text-decoration: none;
+}
+
+.card-group img {
+    margin: 0;
+    width: 100%;
+    height: auto;
+}
+
+.card-group .field--type-image {
+    margin: 0
+}
+
+.slick {
+    width: 100%;
+}
+
+.slick>div {
+    margin: 0 15px;
+}
+
+#header {
+    -moz-box-shadow: 0 5px 7px 0 rgba(0,0,0,0.2);
+    -webkit-box-shadow: 0 5px 7px 0 rgba(0,0,0,0.2);
+    box-shadow: 0 5px 7px 0 rgba(0,0,0,0.2);
+}
+.path-frontpage #block-watch-tonight-content {
+    display: none;
+}
+.path-frontpage #main,
+.path-frontpage #main #content,
+.node--type-movie #main,
+.node--type-movie #main #content {
+    padding: 0;
+}
+.path-frontpage #main > .row,
+.node--type-movie #main > .row {
+    margin: 0;
+}
+.node--type-movie article > .node__content {
+    min-height: 600px;
+    background: #{$gray-800};
+    padding-bottom: 40%;
+    margin: 0;
+}
+.node--type-movie article > .node__content > iframe {
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+.node--type-movie article > .node__content .movie-title,
+.node--type-movie article > .node__content .movie-rating,
+.node--type-movie article > .node__content .movie-length {
+    z-index: 999;
+    position: absolute;
+    opacity: 0.8;
+    max-width: 45%;
+}
+.node--type-movie article > .node__content .movie-title {
+    color: #{$accent-shade};
+    font-weight: 700;
+    font-size: 2em;
+    left: 10px;
+    top: 10px;
+}
+.node--type-movie article > .node__content .movie-rating {
+    right: 10px;
+    top: 10px;
+}
+.node--type-movie article > .node__content .movie-rating .fa-star {
+    color: #{$yellow};
+}
+.node--type-movie article > .node__content .movie-length {
+    left: 10px;
+    bottom: 10px;
+}
+.node--type-movie article > .node__content .movie-length .fa-video {
+    color: #{$accent-shade};
+}
+
+.loader .fa {
+    color: #{$accent-shade};
+}
+.loader-fullscreen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5);
+}

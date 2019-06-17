@@ -1,0 +1,8 @@
+{
+  "name": "watch_tonight/wt_common",
+  "type": "drupal-module",
+  "require": {
+  	"twbs/bootstrap": "*"
+  },
+  "minimum-stability": "dev"
+}

@@ -1,0 +1,14 @@
+global-styling:
+  version: VERSION
+  js: 
+    js/popper.min.js: {}
+    js/bootstrap.min.js: {}
+    js/global.js: {}
+  css:
+    component:
+      /vendor/components/font-awesome/css/all.min.css: { minified: true }
+      css/style.css: {}
+  dependencies:
+    - core/jquery
+    - core/jquery.once
+    - core/drupal

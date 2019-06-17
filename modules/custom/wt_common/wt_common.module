@@ -1,0 +1,312 @@
+<?php
+
+use Drupal\node\Entity\Node;
+use Drupal\Core\Config\ImmutableConfig;
+
+/**
+ * Implements hook_library_info_alter().
+ */
+function wt_common_library_info_alter(&$libraries, $extension) {
+  if ($extension == 'admin_toolbar') {
+    $moduleHandler = \Drupal::service('module_handler');
+    $toolbar_css = '/' . $moduleHandler->getModule('wt_common')->getPath()
+      . '/style/css/wt_common_admin_toolbar.css';
+    $libraries['toolbar.tree']['css']['theme'][$toolbar_css] = [];
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function wt_common_theme($existing, $type, $theme, $path) {
+  $items = [
+    'wt_common_movies_list' => [
+      'variables' => [
+        'list' => [],
+        'page' => 1,
+        'is_ajax' => FALSE,
+      ],
+      'template' => 'wt-common-movies-list',
+    ],
+  ];
+
+  return $items;
+}
+
+/**
+ * Helper function to get movie node select options.
+ */
+function wt_common_get_movie_node_select_options() {
+  $entityManager = \Drupal::service('entity_field.manager');
+  $fields = $entityManager->getFieldDefinitions('node', 'movie');
+  $allowed_values = [];
+
+  foreach (['type', 'genre'] as $field) {
+    $allowed_values[$field] = $fields['field_' . $field]->getSetting('allowed_values');
+  }
+
+  return $allowed_values;
+}
+
+/**
+ * Helper function to get existing movie nids.
+ * @param array $imdb_ids
+ */
+function wt_common_get_existing_movie_nids(array $imdb_ids) {
+  $query = db_select('node__field_imdb_id', 'nfii')
+    ->fields('nfii', ['field_imdb_id_value', 'entity_id'])
+    ->fields('nfvtu', ['field_video_thumbnail_url_value'])
+    ->fields('nfyi', ['field_youtube_id_value'])
+    ->fields('nfvi', ['field_vimeo_id_value']);
+  $query->leftJoin(
+    'node__field_video_thumbnail_url',
+    'nfvtu',
+    'nfvtu.entity_id = nfii.entity_id AND nfvtu.bundle = nfii.bundle'
+  );
+  $query->leftJoin(
+    'node__field_youtube_id',
+    'nfyi',
+    'nfyi.entity_id = nfii.entity_id AND nfyi.bundle = nfii.bundle'
+  );
+  $query->leftJoin(
+    'node__field_vimeo_id',
+    'nfvi',
+    'nfvi.entity_id = nfii.entity_id AND nfvi.bundle = nfii.bundle'
+  );
+  $query->join('node_field_data', 'nfd', 'nfd.nid = nfii.entity_id');
+  $query->condition('nfii.bundle', 'movie')
+    ->condition('nfii.field_imdb_id_value', $imdb_ids, 'IN')
+    ->condition('nfd.status', 1);
+  $result = $query->execute()->fetchAll();
+  $exists = [];
+
+  foreach ($result as $res) {
+    $exists[$res->field_imdb_id_value] = [
+      'nid' => $res->entity_id,
+      'video_thumbnail' => $res->field_video_thumbnail_url_value,
+      'youtube' => $res->field_youtube_id_value,
+      'vimeo' => $res->field_vimeo_id_value,
+    ];
+  }
+
+  return $exists;
+}
+
+/**
+ * Helper function to set movie node video.
+ * @param Node $node
+ * @param array $providers
+ * @param $config ImmutableConfig|NULL
+ */
+function wt_common_set_movie_node_video(Node &$node, array $providers = [], $config = NULL) {
+  if (empty($config)) {
+    $config = \Drupal::config('config.wt_common');
+  }
+
+  $video_params = [
+    'maxResults' => 3,
+    'q' => $node->getTitle(),
+    'order' => 'relevance',
+    'safeSearch' => 'strict',
+  ];
+
+  $year = $node->get('field_year')->getValue();
+  $year = (!empty($year)) ? $year[0]['value'] : '';
+
+  if (!empty($year)) {
+    $video_params['q'] .= ' ' . $year;
+    $video_params['publishedAfter'] = date(
+      "Y-m-d\TH:i:s.000\Z",
+      strtotime($year . '-01-01 00:00:00 -1 year')
+    );
+  }
+
+  $video_params['q'] .= ' Trailer';
+  $video_title_words = explode(" ", $video_params['q']);
+
+  foreach ($video_title_words as $k => $v) {
+    $video_title_words[$k] = trim($v, " \t\n\r\0\x0B:-_");
+  }
+
+  (!empty($providers)) ?: $providers = ['youtube', 'vimeo'];
+
+  foreach ($providers as $provider) {
+    $video = call_user_func_array(
+      'wt_common_get_' . $provider . '_video_id',
+      [$video_params, $video_title_words, $config]
+    );
+
+    if (!empty($video)) {
+      if (is_array($video)) {
+        $node->set('field_' . $provider . '_id', $video['id']);
+        $node->set('field_video_thumbnail_url', $video['thumbnail']);
+        return $video;
+      }
+      else {
+        $node->set('field_' . $provider . '_id', $video);
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+/**
+ * Helper function to get Movie Trailer Youtube Video Id.
+ * @param array $params
+ * @param array $words
+ * @param $config ImmutableConfig|NULL
+ */
+function wt_common_get_youtube_video_id(array $params, array $words, $config = NULL) {
+  if (empty($config)) {
+    $config = \Drupal::config('config.wt_common');
+  }
+
+  $google_api_key_quota_exceeded = $config->get('google_api_key_quota_exceeded');
+
+  if (empty($google_api_key_quota_exceeded) || time() >= ($google_api_key_quota_exceeded + 24 * 3600)) {
+    if (($youtube_service = wt_common_get_youtube_service($config)) !== FALSE) {
+      try {
+        $response = $youtube_service->search->listSearch('snippet', $params);
+      } catch (Google_Service_Exception $e) {
+        $config = \Drupal::service('config.factory')->getEditable('config.wt_common');
+        $config->set('google_api_key_quota_exceeded', time())->save();
+        return 'api_error';
+      }
+
+      if (!empty($response) && !empty($response['items'])) {
+        foreach ($response['items'] as $item) {
+          if (wt_common_check_video_title_match($item->snippet->title, $words)) {
+            return [
+              'id' => $item->id->videoId,
+              'thumbnail' => 'https://img.youtube.com/vi/' . $item->id->videoId . '/hqdefault.jpg',
+            ];
+          }
+        }
+      }
+    }
+
+    return 'not_found';
+  }
+
+  return 'api_error';
+}
+
+/**
+ * Helper function to get Movie Trailer Vimeo Video Id.
+ * @param array $params
+ * @param array $words
+ * @param $config ImmutableConfig|NULL
+ */
+function wt_common_get_vimeo_video_id(array $params, array $words, $config = NULL) {
+  if (empty($config)) {
+    $config = \Drupal::config('config.wt_common');
+  }
+
+  $vimeo_params = [
+    'query' => $params['q'],
+    'sort' => 'relevant',
+  ];
+
+  $client = new \Vimeo\Vimeo(
+    $config->get('vimeo_client_id'),
+    $config->get('vimeo_client_secret'),
+    $config->get('vimeo_access_token')
+  );
+  $response = $client->request('/videos', $vimeo_params, 'GET');
+
+  if ($response['status'] == 200) {
+    if (isset($response['body']) && isset($response['body']['data']) && !empty($response['body']['data'])) {
+      $lang_id = \Drupal::languageManager()->getCurrentLanguage()->getId();
+
+      foreach ($response['body']['data'] as $item) {
+        if (wt_common_check_video_title_match($item['name'], $words)) {
+          if (!isset($candidate)) {
+            $candidate = $item;
+          }
+
+          if (!empty($item['language']) && substr($item['language'], 0, 2) == $lang_id) {
+            $candidate = $item;
+            break;
+          }
+        }
+      }
+
+      if (isset($candidate)) {
+        $uri_parts = explode("/", $candidate['uri']);
+        $id = (int) $uri_parts[count($uri_parts) - 1];
+        $thumbnail = '';
+
+        if (isset($candidate['pictures']) && isset($candidate['pictures']['sizes'])) {
+          foreach ($candidate['pictures']['sizes'] as $size) {
+            $thumbnail = $size['link'];
+
+            if ($size['width'] >= 480) {
+              break;
+            }
+          }
+        }
+
+        return [
+          'id' => $id,
+          'thumbnail' => $thumbnail,
+        ];
+      }
+    }
+
+    return 'not_found';
+  }
+
+  return 'api_error';
+}
+
+/**
+ * Helper function to check returned video title match film title trailer.
+ * @param string $title
+ * @param array $words
+ */
+function wt_common_check_video_title_match($title, array $words) {
+  $all_words_match = TRUE;
+
+  foreach ($words as $word) {
+    $all_words_match = (mb_stripos($title, $word) !== FALSE);
+
+    if (!$all_words_match) {
+      break;
+    }
+  }
+
+  return $all_words_match;
+}
+
+/**
+ * Helper function to get Youtube service.
+ */
+function wt_common_get_youtube_service($config = NULL) {
+  if (empty($config)) {
+    $config = \Drupal::config('config.wt_common');
+  }
+
+  $google_api_key = $config->get('google_api_key');
+
+  if (!empty($google_api_key)) {
+    $client = new Google_Client();
+    $client->setScopes([
+      'https://www.googleapis.com/auth/youtube.readonly',
+    ]);
+    $client->setDeveloperKey($google_api_key);
+
+    return new Google_Service_YouTube($client);
+  }
+
+  return FALSE;
+}
+
+/**
+ * Helper dump function.
+ */
+function wt_common_dump($var, $depth = 4) {
+  echo "<pre>";
+  \Doctrine\Common\Util\Debug::dump($var, $depth);
+  echo "</pre>";
+}

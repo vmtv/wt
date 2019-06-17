@@ -1,0 +1,6 @@
+services:
+  wt_common.twig_extension:
+    arguments: ['@renderer']
+    class: Drupal\wt_common\TwigExtension\WtCommonTwigExtension
+    tags:
+      - { name: twig.extension }

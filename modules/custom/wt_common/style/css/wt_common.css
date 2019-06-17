@@ -1,0 +1,61 @@
+/* VARIABLES */
+.path-frontpage .block-search-movies-block {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: url(../images/search-movies-bg.jpg);
+  background-position: center center;
+  min-height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center; }
+
+.path-frontpage .block-search-movies-block .content {
+  width: 800px;
+  max-width: 100%;
+  margin: auto; }
+
+#wt-common-search-movies-form .input-group input {
+  margin: 0; }
+
+.movies-list .video-thumbnail {
+  height: 250px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center; }
+
+.movies-list a,
+.movies-list a:hover,
+.movies-list a:visited,
+.movies-list a:focus {
+  text-decoration: none; }
+
+.movies-list .video-thumbnail span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.5); }
+
+.movies-list .video-thumbnail i {
+  color: #022b51;
+  margin: auto; }
+
+.movies-list .video-thumbnail img {
+  max-height: 100%; }
+
+.movies-list .movie-thumbnail + .movie-info {
+  margin-left: 80px; }
+
+.movies-list .movie-info .movie-title {
+  color: #022b51;
+  font-weight: 700; }
+
+.movies-list .movie-info .fa-star {
+  color: #ffc107; }
+
+.movies-list .movie-info .fa-video {
+  color: #022b51; }
+
+/*# sourceMappingURL=wt_common.css.map */

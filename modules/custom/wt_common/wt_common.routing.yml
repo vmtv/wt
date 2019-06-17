@@ -1,0 +1,14 @@
+wt_common.admin:
+  path: '/admin/config/wt_common'
+  defaults:
+    _form: '\Drupal\wt_common\Form\WtCommonSettingsForm'
+    _title: 'Watch Tonight Common'
+  requirements:
+    _permission: 'administer wt_common'
+wt_common.search:
+  path: '/search/movies'
+  defaults:
+    _controller: '\Drupal\wt_common\Controller\WtCommonController::search_movies'
+    _title: 'Search'
+  requirements:
+    _permission: 'access content'

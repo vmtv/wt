@@ -1,0 +1,3 @@
+administer wt_common:
+  title: 'Administer wt_common'
+  description: 'Allows a user to configure wt_common module.'

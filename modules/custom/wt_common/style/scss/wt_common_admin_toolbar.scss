@@ -1,0 +1,24 @@
+// Default variables.
+@import "../../../../../themes/custom/watch_tonight/scss/variables";
+
+.toolbar-oriented .toolbar-bar {
+  position: fixed !important;
+  z-index: 1031 !important;
+}
+.toolbar-tray-open.toolbar-horizontal.toolbar-fixed {
+  padding-top: 80px !important;
+}
+#toolbar-administration .toolbar-bar {
+  background-color: #{$accent-shade};
+}
+.toolbar-icon-admin-toolbar-tools-help:before {
+	background-image: url(../images/logo_admin_toolbar.png);
+}
+.page-iframe.toolbar-horizontal.toolbar-fixed,
+.page-iframe.toolbar-vertical.toolbar-fixed {
+  padding-top: 0 !important;
+  margin: 0 !important;
+}
+.page-iframe #toolbar-administration {
+  display: none;
+}

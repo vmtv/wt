@@ -1,0 +1,14 @@
+wt_common:
+  version: 1.0.0
+  css:
+    theme:
+      style/css/wt_common.css: {}
+  js:
+    js/wt_common.js: {}
+wt_common_admin:
+  version: 1.0.0
+  css:
+    theme:
+      style/css/wt_common_admin.css: {}
+  js:
+    js/wt_common_admin.js: {}

@@ -1,0 +1,6 @@
+wt_common.admin:
+  title: 'Watch Tonight Common'
+  description: 'Watch Tonight Common admin settings page.'
+  parent: system.admin_config
+  route_name: wt_common.admin
+  weight: 100
