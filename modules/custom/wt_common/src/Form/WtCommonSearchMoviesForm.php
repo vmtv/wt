@@ -71,7 +71,7 @@ class WtCommonSearchMoviesForm extends FormBase {
       '#suffix' => '</div>',
     ];
 
-    $form['#action'] = Url::fromRoute('wt_common.search')->toString();
+    $form['#action'] = Url::fromRoute('<front>')->toString();
     $form['#prefix'] = '<div class="d-block shadow bg-white rounded mt-3 mb-3 p-3">';
     $form['#suffix'] = '</div>';
 
