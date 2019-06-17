@@ -33,6 +33,7 @@ class WtCommonController extends ControllerBase {
     $title_types = (!empty($title_type)) ? [$title_type] : [
       TitleSearchAdvanced::MOVIE,
       TitleSearchAdvanced::TV_MOVIE,
+      TitleSearchAdvanced::DOCUMENTARY,
     ];
     $search->setTitleTypes($title_types);
 

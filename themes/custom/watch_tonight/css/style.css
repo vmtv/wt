@@ -9307,22 +9307,22 @@ a {
   top: 10px; }
 
 .node--type-movie article > .node__content .movie-rating {
-  right: 10px;
-  top: 10px; }
+  left: 10px;
+  bottom: 10px; }
 
 .node--type-movie article > .node__content .movie-rating .fa-star {
   color: #ffc107; }
 
 .node--type-movie article > .node__content .movie-length {
   left: 10px;
-  bottom: 10px; }
+  bottom: 60px; }
 
 .node--type-movie article > .node__content .movie-length .fa-video {
   color: #022b51; }
 
 .node--type-movie #block-socialsharingblock {
   right: 10px;
-  bottom: 10px;
+  top: 10px;
   background: #fff;
   border-radius: 0.25rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
