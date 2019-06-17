@@ -27,7 +27,7 @@
                 {% if item.rating is not empty %}
                 <span class="movie-rating d-block">
                   <i class="fas fa-star mr-1"></i>
-                  {{ item.rating ~ ' ' ~ ('According to IMDB' | t) }}
+                  {{ (item.rating | number_format(1)) ~ ' ' ~ ('According to IMDB' | t) }}
                 </span>
                 {% endif %}
                 {% if item.length is not empty %}

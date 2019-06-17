@@ -98,7 +98,7 @@
     {% if node.field_rating[0].value is not empty %}
       <div class="movie-rating d-block shadow bg-white rounded p-2 position-absolute">
         <i class="fas fa-star mr-1"></i>
-        {{ node.field_rating[0].value ~ ' ' ~ ('According to IMDB' | t) }}
+        {{ (node.field_rating[0].value | number_format(1)) ~ ' ' ~ ('According to IMDB' | t) }}
       </div>
     {% endif %}
     {% if node.field_length[0].value is not empty %}
