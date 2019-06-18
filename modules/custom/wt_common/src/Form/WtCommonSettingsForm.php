@@ -45,14 +45,14 @@ class WtCommonSettingsForm extends ConfigFormBase {
     ];
     $this->fields[] = 'imdb_search_limit';
 
-    $form['google_api_key'] = [
-      '#title' => $this->t('Google Api Key'),
-      '#type' => 'textfield',
-      '#default_value' => $config->get('google_api_key'),
+    $form['google_api_keys'] = [
+      '#title' => $this->t('Google Api Keys'),
+      '#type' => 'textarea',
+      '#default_value' => $config->get('google_api_keys'),
       '#attributes' => ['autocomplete' => 'off'],
       '#required' => TRUE,
     ];
-    $this->fields[] = 'google_api_key';
+    $this->fields[] = 'google_api_keys';
 
     $form['vimeo_client_id'] = [
       '#title' => $this->t('Vimeo Client Id'),

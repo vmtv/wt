@@ -162,15 +162,27 @@ function wt_common_get_youtube_video_id(array $params, array $words, $config = N
     $config = \Drupal::config('config.wt_common');
   }
 
-  $google_api_key_quota_exceeded = $config->get('google_api_key_quota_exceeded');
+  $google_api_key = $config->get('google_api_key');
 
-  if (empty($google_api_key_quota_exceeded) || time() >= ($google_api_key_quota_exceeded + 24 * 3600)) {
+  if (!is_numeric($google_api_key) || time() >= ($google_api_key + 24 * 3600)) {
+    // Set first Google Api Key after 1d.
+    if (is_numeric($google_api_key)) {
+      wt_common_set_next_google_api_key($google_api_key);
+    }
+
     if (($youtube_service = wt_common_get_youtube_service($config)) !== FALSE) {
       try {
         $response = $youtube_service->search->listSearch('snippet', $params);
       } catch (Google_Service_Exception $e) {
-        $config = \Drupal::service('config.factory')->getEditable('config.wt_common');
-        $config->set('google_api_key_quota_exceeded', time())->save();
+        if ($e->getCode() == 403) {
+          // Set next Google Api Key or set failed timestamp.
+          wt_common_set_next_google_api_key($google_api_key);
+
+          if (!is_numeric($google_api_key)) {
+            return wt_common_get_youtube_video_id($params, $words, $config);
+          }
+        }
+
         return 'api_error';
       }
 
@@ -300,6 +312,43 @@ function wt_common_get_youtube_service($config = NULL) {
   }
 
   return FALSE;
+}
+
+/**
+ * Helper function to parse a list of Google Api Keys.
+ * @param string $keys
+ */
+function wt_common_parse_google_api_keys($keys) {
+  $keys = explode("\r\n", $keys);
+
+  foreach ($keys as $k => $v) {
+    $v = trim($v);
+
+    if (empty($v)) {
+      unset($keys[$k]);
+    }
+  }
+
+  return $keys;
+}
+
+/**
+ * Helper function to set next Google Api Key form the list.
+ * @param string $current_google_api_key
+ */
+function wt_common_set_next_google_api_key(&$current_google_api_key) {
+  $config = \Drupal::service('config.factory')->getEditable('config.wt_common');
+  $google_api_keys = wt_common_parse_google_api_keys($config->get('google_api_keys'));
+
+  if (is_numeric($current_google_api_key)) {
+    $current_google_api_key = reset($google_api_keys);
+  }
+  else {
+    $key = array_search($current_google_api_key, $google_api_keys);
+    $current_google_api_key = (isset($google_api_keys[$key + 1])) ? $google_api_keys[$key + 1] : time();
+  }
+
+  $config->set('google_api_key', $current_google_api_key)->save();
 }
 
 /**
