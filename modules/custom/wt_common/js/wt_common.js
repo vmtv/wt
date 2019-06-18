@@ -27,7 +27,7 @@
           var elem = $(this);
           var wrapper = elem.parent();
           var search = window.location.search;
-          search += ((!(search.indexOf('?') >= 0)) ? '?' : '') + 'page=' + elem.data('page');
+          search += ((!(search.indexOf('?') >= 0)) ? '?' : '&') + 'page=' + elem.data('page');
 
           wrapper.html('<div class="loader"><div class="fa fa-5x fa-spinner fa-spin"></div></div>');
 
