@@ -2,6 +2,8 @@
 
 namespace Drupal\wt_common\Imdb;
 
+use Imdb\Title;
+
 class TitleSearchAdvanced extends \Imdb\TitleSearchAdvanced
 {
   protected $title = null;
@@ -239,5 +241,43 @@ class TitleSearchAdvanced extends \Imdb\TitleSearchAdvanced
     }
 
     return $ret;
+  }
+
+  protected function getTitleType($type)
+  {
+    switch ($type) {
+      case 'tv_series':
+        return Title::TV_SERIES;
+        break;
+      case 'tv_episode':
+        return Title::TV_EPISODE;
+        break;
+      case 'mini_series':
+        return Title::TV_MINI_SERIES;
+        break;
+      case 'tv_movie':
+        return Title::TV_MOVIE;
+        break;
+      case 'tv_special':
+        return Title::TV_SPECIAL;
+        break;
+      case 'tv_short':
+        return Title::TV_SHORT;
+        break;
+      case 'documentary':
+        return 'Documentary';
+        break;
+      case 'game':
+        return Title::GAME;
+        break;
+      case 'video':
+        return Title::VIDEO;
+        break;
+      case 'short':
+        return Title::SHORT;
+        break;
+      default:
+        return 'Feature Film';
+    }
   }
 }
