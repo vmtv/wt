@@ -1,0 +1,26 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the wt_common module.
+ */
+
+/**
+ * Unpublish existing movie nodes with empty video thumbnail.
+ */
+function wt_common_update_8001() {
+  $query = \Drupal::entityQuery('node')
+    ->condition('type', 'movie')
+    ->condition('status', NODE_PUBLISHED)
+    ->notExists('field_video_thumbnail_url');
+  $nids = $query->execute();
+
+  if (!empty($nids)) {
+    $nodes = \Drupal\node\Entity\Node::loadMultiple($nids);
+
+    foreach ($nodes as $node) {
+      $node->setUnpublished();
+      $node->save();
+    }
+  }
+}

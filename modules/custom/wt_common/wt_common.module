@@ -24,6 +24,7 @@ function wt_common_theme($existing, $type, $theme, $path) {
       'variables' => [
         'list' => [],
         'page' => 1,
+        'search_type' => 'user',
         'is_ajax' => FALSE,
       ],
       'template' => 'wt-common-movies-list',
@@ -52,12 +53,18 @@ function wt_common_get_movie_node_select_options() {
  * Helper function to get existing movie nids.
  * @param array $imdb_ids
  */
-function wt_common_get_existing_movie_nids(array $imdb_ids) {
+function wt_common_get_existing_movie_nids_by_imdb_ids(array $imdb_ids) {
   $query = db_select('node__field_imdb_id', 'nfii')
-    ->fields('nfii', ['field_imdb_id_value', 'entity_id'])
+    ->fields('nfii', ['field_imdb_id_value'])
+    ->fields('nfd', ['nid', 'status'])
     ->fields('nfvtu', ['field_video_thumbnail_url_value'])
     ->fields('nfyi', ['field_youtube_id_value'])
     ->fields('nfvi', ['field_vimeo_id_value']);
+  $query->join(
+    'node_field_data',
+    'nfd',
+    'nfd.nid = nfii.entity_id AND nfd.type = nfii.bundle'
+  );
   $query->leftJoin(
     'node__field_video_thumbnail_url',
     'nfvtu',
@@ -75,15 +82,15 @@ function wt_common_get_existing_movie_nids(array $imdb_ids) {
   );
   $query->join('node_field_data', 'nfd', 'nfd.nid = nfii.entity_id');
   $query->condition('nfii.bundle', 'movie')
-    ->condition('nfii.field_imdb_id_value', $imdb_ids, 'IN')
-    ->condition('nfd.status', 1);
+    ->condition('nfii.field_imdb_id_value', $imdb_ids, 'IN');
   $result = $query->execute()->fetchAll();
   $exists = [];
 
   foreach ($result as $res) {
     $exists[$res->field_imdb_id_value] = [
-      'nid' => $res->entity_id,
-      'video_thumbnail' => $res->field_video_thumbnail_url_value,
+      'nid' => $res->nid,
+      'status' => $res->status,
+      'video_thumbnail_url' => $res->field_video_thumbnail_url_value,
       'youtube' => $res->field_youtube_id_value,
       'vimeo' => $res->field_vimeo_id_value,
     ];

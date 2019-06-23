@@ -31,9 +31,17 @@ class WtCommonSettingsForm extends ConfigFormBase {
 
     $config = $this->config('config.wt_common');
 
-    $google_api_key = $config->get('google_api_key');
-
     $form['#tree'] = TRUE;
+
+    $form['user_search_items_per_page'] = [
+      '#title' => $this->t('User Search Items Per Page'),
+      '#description' => $this->t('Limit number of results to be retured for User per page. Default: 12.'),
+      '#type' => 'textfield',
+      '#default_value' => $config->get('user_search_items_per_page'),
+      '#attributes' => ['autocomplete' => 'off'],
+      '#required' => TRUE,
+    ];
+    $this->fields[] = 'user_search_items_per_page';
 
     $form['imdb_search_limit'] = [
       '#title' => $this->t('IMDB Search Limit'),

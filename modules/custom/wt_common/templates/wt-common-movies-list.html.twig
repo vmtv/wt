@@ -5,19 +5,26 @@
 {% endif %}
     {% if list is not empty %}
       {% for item in list %}
-        {% if item.video_thumbnail is not empty %}
+        {% if item.video_thumbnail_url is not empty %}
         <div class="col-lg-3 col-md-6 col-sm-6 mb-3">
           <a href="{{ path('entity.node.canonical', {'node': item.nid}) }}" class="d-block shadow bg-white rounded">
             <span class="video-thumbnail d-block position-relative mb-2"
-              style="background-image: url({{ item.video_thumbnail }});">
-              <span>
+              style="background-image: url({{ item.video_thumbnail_url }});">
+              <span class="play-circle">
                 <i class="far fa-5x fa-play-circle"></i>
               </span>
+              {% if search_type == 'admin' %}
+                {% if item.status == 1 %}
+                  <span class="badge badge-success position-absolute">{{ 'Published' | t }}</span>
+                {% else %}
+                  <span class="badge badge-danger position-absolute">{{ 'Unpublished' | t }}</span>
+                {% endif %}
+              {% endif %}
             </span>
             <span class="d-block p-3 clearfix">
-              {% if item.thumbnail is not empty %}
+              {% if item.thumbnail_url is not empty %}
                 <span class="movie-thumbnail d-block float-left">
-                  <img src="{{ item.thumbnail }}" alt="{{ item.title }}" />
+                  <img src="{{ item.thumbnail_url }}" alt="{{ item.title }}" />
                 </span>
               {% endif %}
               <span class="movie-info d-block">

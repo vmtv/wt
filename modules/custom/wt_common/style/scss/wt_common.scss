@@ -33,7 +33,7 @@
 .movies-list a:focus {
   text-decoration:none;
 }
-.movies-list .video-thumbnail span {
+.movies-list .video-thumbnail span.play-circle {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -41,12 +41,13 @@
   height: 100%;
   background: rgba(255, 255, 255, 0.5);
 }
+.movies-list .video-thumbnail span.badge {
+  right: 10px;
+  bottom: 10px;
+}
 .movies-list .video-thumbnail i {
   color: #{$accent-shade};
   margin: auto;
-}
-.movies-list .video-thumbnail img {
-  max-height: 100%;
 }
 .movies-list .movie-thumbnail + .movie-info {
   margin-left: 80px;

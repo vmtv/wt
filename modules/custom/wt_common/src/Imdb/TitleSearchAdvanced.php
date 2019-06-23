@@ -143,7 +143,7 @@ class TitleSearchAdvanced extends \Imdb\TitleSearchAdvanced
       preg_match('/tt(\d{7,8})/', $titleElement->getAttribute('href'), $match);
 
       $id = $match[1];
-      $thumbnail = NULL;
+      $thumbnail_url = NULL;
       $rating = NULL;
       $length = NULL;
       $ep_id = NULL;
@@ -163,9 +163,9 @@ class TitleSearchAdvanced extends \Imdb\TitleSearchAdvanced
         $imgItems = $xp->query(".//img", $item);
 
         if ($imgItems->length > 0) {
-          $thumbnail = $imgItems->item(0)->getAttribute('loadlate');
+          $thumbnail_url = $imgItems->item(0)->getAttribute('loadlate');
 
-          if (!empty($thumbnail)) {
+          if (!empty($thumbnail_url)) {
             break;
           }
         }
@@ -227,7 +227,7 @@ class TitleSearchAdvanced extends \Imdb\TitleSearchAdvanced
         'title' => $title,
         'year' => $year,
         'type' => $mtype,
-        'thumbnail' => $thumbnail,
+        'thumbnail_url' => $thumbnail_url,
         'rating' => $rating,
         'length' => $length,
         'genre' => $genre,
